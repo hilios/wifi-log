@@ -1,0 +1,18 @@
+[Unit]
+Description=Start WiFi APC Monitor
+After=network.target
+Requires=network.target
+
+[Service]
+ExecStartPre=airmon-ng start wlan0
+ExecStartPre=airmon-ng start wlan0
+ExecStart=wifi-apc
+ExecStop=wifi-apc stop
+
+# Retry
+Restart=always
+StartLimitInterval=30
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
