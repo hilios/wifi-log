@@ -29,7 +29,7 @@ def start(detached, url=None):
         sys.exit(1)
 
     print('Starting...')
-    
+
     context = daemon.DaemonContext(detach_process=detached, umask=0o002,
         working_directory='/var/lib/apc',
         stdout=LOG_FILE if detached else sys.stdout,
@@ -51,8 +51,14 @@ def start(detached, url=None):
             print("Stopping now!")
 
 
-def stop(**kwargs):
-    print("Bye, bye!")
-    print(PID_FILE.pid)
+def stop():
+    if not PID_FILE.is_locked():
+        print("Nothing is running.")
+        sys.exit(0)
 
+    print("Stopping now... Bye, bye!")
     os.kill(PID_FILE.pid, signal.SIGTERM)
+
+
+def install():
+    print("Installing...")
