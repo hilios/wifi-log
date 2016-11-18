@@ -62,5 +62,3 @@ def stop():
 
 def install():
     log.info('Installing...')
-
-    sniff(iface="wlan0mon", prn=lambda x:x.sprintf("{Dot11Beacon:%Dot11.addr3%\t%Dot11Beacon.info%\t%PrismHeader.channel%\tDot11Beacon.cap%}"))
