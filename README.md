@@ -2,7 +2,7 @@
 
 ### Automatic passengers count through WiFi signal
 
-A simple command line utility to count people around some device with a WiFi antena in monitor mode.
+A simple command line utility to count people in the area of a WiFi antena.
 
 Set the promiscuous mode at the wireless interface:
 
