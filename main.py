@@ -18,17 +18,21 @@ start.add_argument('interface', action='store', help="the interface to monitor")
 stop = subcmd.add_parser('stop')
 stop.set_defaults(func=cmd.stop)
 
+install = subcmd.add_parser('install')
+install.set_defaults(func=cmd.install)
+
 
 def run():
+    "Parse the command line and run the application"
     args = parser.parse_args()
     kwargs = vars(args)
-
+    # Setup the logging
     verbose = kwargs.pop('verbose')
     logging.basicConfig(
         format="%(asctime)-15s\t%(levelname)-5s\t%(message)s",
         level=logging.INFO if not verbose else logging.DEBUG,
     )
-
+    # Execute the command
     func = kwargs.pop('func')
     func(**kwargs)
 
