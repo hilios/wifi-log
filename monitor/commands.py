@@ -10,21 +10,19 @@ from datetime import date
 
 log = logging.getLogger('cmd')
 
-
 if os.geteuid() != 0:
     print >> sys.stderr, "You need root permissions to run this program."
     sys.exit(1)
 
-# Prepare the environment
 try:
-    os.makedirs('/var/lib/apc/log')
+    # Setup the log dir
+    os.makedirs('/var/log/apc')
 except OSError as err:
     if not err.strerror in ['File exists']:
         raise err
 
-
 PID_FILE = lockfile.FileLock('/var/run/apc.pid')
-LOG_FILE = open('/var/lib/apc/log/%s.log' % date.today().isoformat(), 'w+')
+LOG_FILE = open('/var/log/apc/%s.log' % date.today().isoformat(), 'w+')
 
 
 def start(interface, detached=False, log_file=None, url=None):
@@ -35,7 +33,6 @@ def start(interface, detached=False, log_file=None, url=None):
     log.info('Starting to monitor')
 
     context = daemon.DaemonContext(detach_process=detached, umask=0o002,
-        working_directory='/var/lib/apc',
         stdout=LOG_FILE if detached else log_file or sys.stdout,
         stderr=LOG_FILE if detached else log_file or sys.stderr,
         pidfile=PID_FILE,
