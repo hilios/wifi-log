@@ -46,7 +46,7 @@ def start(interface, detached=False, log_file=None, url=None):
     with context:
         try:
             from monitor import sniffer
-            sniffer.start()
+            sniffer.start(interface)
         except KeyboardInterrupt:
             log.info('Stopping, user interrupt')
 
