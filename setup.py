@@ -10,7 +10,6 @@ setup(
     install_requires=[
         'scapy',
         'zmq',
-        'sh',
     ],
     entry_points='''
         [console_scripts]
