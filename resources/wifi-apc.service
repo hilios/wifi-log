@@ -1,16 +1,12 @@
 [Unit]
 Description=Start WiFi APC Monitor
-After=syslog.target network.target remote-fs.target nss-lookup.target
 Requires=network.target
 
 [Service]
-ExecStartPre=airmon-ng start wlan0
-ExecStart=wifi-apc wlan0mon
-
-# Retry
+ExecStartPre=/usr/local/sbin/airmon-ng start wlan0
+ExecStart=/usr/local/bin/wifi-apc wlan0mon
 Restart=always
-StartLimitInterval=30
-StartLimitBurst=5
+RestartSec=1s
 
 [Install]
 WantedBy=multi-user.target
