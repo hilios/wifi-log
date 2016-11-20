@@ -4,10 +4,8 @@ After=syslog.target network.target remote-fs.target nss-lookup.target
 Requires=network.target
 
 [Service]
-PIDFile=/var/run/apc.pid
 ExecStartPre=airmon-ng start wlan0
-ExecStart=wifi-apc start
-ExecStop=wifi-apc stop
+ExecStart=wifi-apc wlan0mon
 
 # Retry
 Restart=always
