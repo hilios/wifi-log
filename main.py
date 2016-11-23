@@ -9,6 +9,7 @@ import argparse
 import logging
 import json
 import os
+import signal
 import sys
 import zmq
 
@@ -26,8 +27,6 @@ def monitor(iface, port):
         print >> sys.stderr, "Did you install all the packager requirements?"
         sys.exit(1)
 
-    log = logging.getLogger(__name__)
-
     # Open socket
     context = zmq.Context()
     socket = context.socket(zmq.PUB)
@@ -37,25 +36,45 @@ def monitor(iface, port):
         "Parses each package captured and publishes to log and socket."
         if pkt.haslayer(Dot11) :
             info = {'mac_address': pkt.addr2.upper(), 'ssid': pkt.info}
-            log.info("Device MAC: %(mac_address)s with SSID: %(ssid)s" % info)
+            logging.info("Found MAC: %(mac_address)s and SSID: %(ssid)s" % info)
             socket.send(json.dumps(info))
 
-    log.info("Monitoring network `%s` publishing at *:%s" % (iface, port))
+    logging.info("Monitoring network `%s` publishing at *:%s" % (iface, port))
 
     sniff(iface=iface, prn=handler, store=False,
         lfilter=lambda p: p.haslayer(Dot11ProbeReq))
 
 
+def signal_handler(signal_code, frame):
+    "Handle interrupt signals from the OS"
+    logging.info("Bye, for now")
+    sys.exit(0)
+
+
 def run():
+    "Parses the CLI and run the application"
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--port', '-P', action='store', type=int, default=5555)
-    parser.add_argument('--log-file', '-l', type=argparse.FileType('w+'))
+    parser.add_argument('--log-file', '-l', action='store',
+        type=argparse.FileType('a+'), default='/var/log/wifi-apc.log')
     parser.add_argument('iface', action='store', help="the interface to monitor")
     args = parser.parse_args()
     # Configure log utility
-    logging.basicConfig(format="%(asctime)-15s\t%(levelname)-5s\t%(message)s",
-        level=logging.INFO if not args.verbose else logging.DEBUG)
+    logging.basicConfig(level=logging.INFO,
+        format="%(asctime)s\t%(levelname)-8s\t%(message)s",
+        filename=args.log_file.name)
+    # Log to console debug messages
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    consolefmt = logging.Formatter('%(asctime)s %(filename)-15s %(levelname)-8s %(message)s')
+    console.setFormatter(consolefmt)
+    logging.getLogger('').addHandler(console)
+    # Setup signal handling to log bye messages
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGQUIT, signal_handler)
+    signal.signal(signal.SIGHUP, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
     # Start monitoring
     monitor(args.iface, args.port)
 
