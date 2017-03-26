@@ -7,6 +7,7 @@ For more info type:
 """
 import argparse
 import logging
+import logging.handlers
 import json
 import os
 import signal
@@ -56,20 +57,26 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--port', '-P', action='store', type=int, default=5555)
-    parser.add_argument('--log-file', '-l', action='store',
-        type=argparse.FileType('a+'), default='/var/log/wifi-apc.log')
+    parser.add_argument('--log-folder', '-l', action='store', default='/var/log/wifi-apc')
     parser.add_argument('iface', action='store', help="the interface to monitor")
     args = parser.parse_args()
-    # Configure log utility
-    logging.basicConfig(level=logging.INFO,
-        format="%(asctime)s\t%(levelname)-8s\t%(message)s",
-        filename=args.log_file.name)
+    # Create log folder
+    if not os.path.exists(args.log_folder):
+        os.makedirs(args.log_folder)
+    # Log formatters
+    defaultfmt = "%(asctime)s\t%(levelname)-8s\t%(message)s"
+    consolefmt = logging.Formatter('%(asctime)s %(filename)-15s %(levelname)-8s %(message)s')
+    # Log to rotating file
+    log_file_name = os.path.join(args.log_folder, "%Y-%m-%d.log")
+    logfile = logging.handlers.TimedRotatingFileHandler(log_file_name, when='D')
+    logfile.setLevel(logging.INFO)
+    logfile.setFormatter(defaultfmt)
     # Log to console debug messages
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG)
-    consolefmt = logging.Formatter('%(asctime)s %(filename)-15s %(levelname)-8s %(message)s')
     console.setFormatter(consolefmt)
-    logging.getLogger('').addHandler(console)
+    # Configure log utility
+    logging.basicConfig(level=logging.INFO, handlers=(console, logfile))
     # Setup signal handling to log bye messages
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
