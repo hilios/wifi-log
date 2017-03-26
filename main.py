@@ -59,9 +59,13 @@ def run():
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--port', '-P', action='store', type=int, default=5555)
     parser.add_argument('--log-file', '-l', action='store',
-        default='/var/log/wifi-apc/monitor.log')
+        default='/var/log/wifi-apc.log')
     parser.add_argument('iface', action='store', help="the interface to monitor")
     args = parser.parse_args()
+    # Create log dir
+    log_dir = os.path.dirname(args.log_file)
+    if not os.path.exists(log_dir):
+        os.path.mkdir(log_dir)
     # Log formatters
     defaultfmt = '%(asctime)s\t%(levelname)-8s\t%(message)s'
     consolefmt = '%(asctime)s %(filename)-15s %(levelname)-8s %(message)s'
@@ -82,7 +86,7 @@ def run():
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGHUP, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
-    # Start monitoring
+    # Start monitorings
     monitor(args.iface, args.port)
 
 
