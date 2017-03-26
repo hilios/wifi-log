@@ -48,7 +48,8 @@ def monitor(iface, port):
 
 def signal_handler(signal_code, frame):
     "Handle interrupt signals from the OS"
-    logging.info("Bye, for now")
+    logging.info("Bye, bye.")
+    logging.shutdown()
     sys.exit(0)
 
 
@@ -67,8 +68,8 @@ def run():
     defaultfmt = "%(asctime)s\t%(levelname)-8s\t%(message)s"
     consolefmt = logging.Formatter('%(asctime)s %(filename)-15s %(levelname)-8s %(message)s')
     # Log to rotating file
-    log_file_name = os.path.join(args.log_folder, "%Y-%m-%d.log")
-    logfile = logging.handlers.TimedRotatingFileHandler(log_file_name, when='D')
+    logfilename = os.path.join(args.log_folder, "%Y-%m-%d.log")
+    logfile = logging.handlers.TimedRotatingFileHandler(logfilename, when='D')
     logfile.setLevel(logging.INFO)
     logfile.setFormatter(defaultfmt)
     # Log to console debug messages
