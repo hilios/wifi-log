@@ -28,6 +28,7 @@ def monitor(iface, port):
         print >> sys.stderr, "Did you install all the packager requirements?"
         sys.exit(1)
 
+    logging.debug("Opening connection socket at *:%s" % port)
     # Open socket
     context = zmq.Context()
     socket = context.socket(zmq.PUB)
@@ -40,7 +41,7 @@ def monitor(iface, port):
             logging.info("Found MAC: %(mac_address)s and SSID: %(ssid)s" % info)
             socket.send(json.dumps(info))
 
-    logging.info("Monitoring network `%s` publishing at *:%s" % (iface, port))
+    logging.debug("Monitoring interface `%s`" % iface)
 
     sniff(iface=iface, prn=handler, store=False,
         lfilter=lambda p: p.haslayer(Dot11ProbeReq))
@@ -48,7 +49,7 @@ def monitor(iface, port):
 
 def signal_handler(signal_code, frame):
     "Handle interrupt signals from the OS"
-    logging.info("Bye, bye.")
+    logging.debug("Bye, bye.")
     logging.shutdown()
     sys.exit(0)
 
@@ -67,19 +68,14 @@ def run():
     if not os.path.exists(log_dir):
         os.path.mkdir(log_dir)
     # Log formatters
-    defaultfmt = '%(asctime)s\t%(levelname)-8s\t%(message)s'
-    consolefmt = '%(asctime)s %(filename)-15s %(levelname)-8s %(message)s'
+    DEFAULT_FMT = '%(asctime)s\t%(levelname)-8s\t%(message)s'
     # Configure log utility
-    logging.basicConfig(level=logging.INFO, format=defaultfmt)
-    # Log to console debug messages
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    console.setFormatter(logging.Formatter(consolefmt))
+    logging.basicConfig(level=logging.DEBUG, format=DEFAULT_FMT)
     # Rotating file log
     logfile = logging.handlers.TimedRotatingFileHandler(args.log_file,
         when='midnight', utc=True)
     logfile.setLevel(logging.INFO)
-    logfile.setFormatter(logging.Formatter(defaultfmt))
+    logfile.setFormatter(logging.Formatter(DEFAULT_FMT))
     logging.getLogger('').addHandler(logfile)
     # Setup signal handling to log bye messages
     signal.signal(signal.SIGTERM, signal_handler)
@@ -87,6 +83,7 @@ def run():
     signal.signal(signal.SIGHUP, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
     # Start monitorings
+    logging.debug("Starting to sniff wifi signal")
     monitor(args.iface, args.port)
 
 
