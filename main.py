@@ -22,11 +22,18 @@ if os.geteuid() != 0:
 
 def monitor(iface, port):
     "Monitors the interface for probe requests."
+    from gps3.agps3threaded import AGPS3mechanism
     try:
         from scapy.all import sniff, Dot11ProbeReq, Dot11ProbeResp, Dot11
     except ImportError:
         print >> sys.stderr, "Did you install all the packager requirements?"
         sys.exit(1)
+
+    logging.debug("Setup GPS")
+    # Start GPS
+    gps = AGPS3mechanism()
+    gps.stream_data()
+    gps.run_thread()
 
     logging.debug("Opening connection socket at *:%s" % port)
     # Open socket
@@ -37,8 +44,16 @@ def monitor(iface, port):
     def handler(pkt):
         "Parses each package captured and publishes to log and socket."
         if pkt.haslayer(Dot11) :
-            info = {'mac_address': pkt.addr2.upper(), 'ssid': pkt.info}
-            logging.info("Found MAC: %(mac_address)s and SSID: %(ssid)s" % info)
+            rssi = (256 - ord(each.notdecoded[-4:-3])) * -1
+            info = {'mac_address': pkt.addr2.upper(), 'ssid': pkt.info, 'rssi': rssi,
+                    'time': gps.data_stream.time,
+                    'lat': gps.data_stream.lat, 'lon': gps.data_stream.lon,
+                    'alt': gps.data_stream.alt, 'speed': gps.data_stream.speed,
+                    'mode': gps.data_stream.mode,'satellites': gps.data_stream,
+                    }
+            logging.info("%(mac_address)s\t%(ssid)s\t%(rssi)s\t" +
+                         "%(lat)s%\t%(lon)s\t%(alt)s\t%(speed)s\t" +
+                         "%(satellites)s\t%(mode)s\t%(time)s" % info)
             socket.send(json.dumps(info))
 
     logging.debug("Monitoring interface `%s`" % iface)
