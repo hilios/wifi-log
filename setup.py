@@ -9,7 +9,6 @@ setup(
     zip_safe=True,
     install_requires=[
         'scapy',
-        'gps3',
         'zmq',
     ],
     entry_points='''
