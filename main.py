@@ -40,7 +40,7 @@ def monitor(iface, port):
         if pkt.haslayer(Dot11) :
             rssi = (256 - ord(pkt.notdecoded[-4:-3])) * -1
             info = {'mac_address': pkt.addr2.upper(), 'ssid': pkt.info, 'rssi': rssi,}
-            logging.info("{mac_address}\t{ssid}\t{rssi}".format(info))
+            logging.info("{mac_address}\t{ssid}\t{rssi}".format(**info))
             socket.send(json.dumps(info))
 
     logging.debug("Monitoring interface `%s`" % iface)
