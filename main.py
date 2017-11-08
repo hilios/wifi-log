@@ -6,6 +6,7 @@ For more info type:
     $ wifi-apc -h
 """
 import argparse
+import datetime
 import logging
 import logging.handlers
 import json
@@ -57,11 +58,13 @@ def signal_handler(signal_code, frame):
 
 def run():
     "Parses the CLI and run the application"
+    current_date = datetime.datetime.utcnow().strftime('%H-%M-%d.log')
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--port', '-P', action='store', type=int, default=5555)
     parser.add_argument('--log-file', '-l', action='store',
-        default='/var/log/wifi-apc.log')
+        default='/var/log/wifi-apc.%s.log' % current_date)
     parser.add_argument('iface', action='store', help="the interface to monitor")
     args = parser.parse_args()
     # Create log dir
@@ -73,8 +76,8 @@ def run():
     # Configure log utility
     logging.basicConfig(level=logging.DEBUG, format=DEFAULT_FMT)
     # Rotating file log
-    logfile = logging.handlers.TimedRotatingFileHandler(args.log_file,
-        when='midnight', utc=True)
+    
+    logfile = logging.handlers.FileHandler(args.log_file)
     logfile.setLevel(logging.INFO)
     logfile.setFormatter(logging.Formatter(DEFAULT_FMT))
     logging.getLogger('').addHandler(logfile)
@@ -83,7 +86,7 @@ def run():
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGHUP, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
-    # Start monitorings
+    # Start WiFi scan
     logging.debug("Starting to sniff wifi signal")
     monitor(args.iface, args.port)
 
