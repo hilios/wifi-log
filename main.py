@@ -76,8 +76,7 @@ def run():
     # Configure log utility
     logging.basicConfig(level=logging.DEBUG, format=DEFAULT_FMT)
     # Rotating file log
-    
-    logfile = logging.handlers.FileHandler(args.log_file)
+    logfile = logging.FileHandler(args.log_file)
     logfile.setLevel(logging.INFO)
     logfile.setFormatter(logging.Formatter(DEFAULT_FMT))
     logging.getLogger('').addHandler(logfile)
