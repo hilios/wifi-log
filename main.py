@@ -58,7 +58,7 @@ def signal_handler(signal_code, frame):
 
 def run():
     "Parses the CLI and run the application"
-    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d.log')
+    current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
