@@ -13,7 +13,6 @@ import json
 import os
 import signal
 import sys
-import uuid
 import zmq
 
 
@@ -61,7 +60,7 @@ def run():
     "Parses the CLI and run the application"
     log_id = str(uuid.uuid4())
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-    default_log_file = '/var/log/wifi-apc.%s.%s.log' % (current_date, log_id)
+    default_log_file = '/var/log/wifi-apc.%s.log' % (current_date)
     # Configure CLI arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
@@ -76,7 +75,7 @@ def run():
     # Log formatters
     logformat = logging.Formatter('%(asctime)s\t%(levelname)-8s\t%(message)s')
     # Rotating file log
-    logfile = logging.FileHandler(args.log_file)
+    logfile = logging.FileHandler(args.log_file, mode='a')
     logfile.setFormatter(logformat)
     logfile.setLevel(logging.INFO)
     # Debug output to console
