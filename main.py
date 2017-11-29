@@ -27,6 +27,7 @@ if os.geteuid() != 0:
 
 def monitor(iface, port):
     "Monitors the interface for probe requests."
+    log.info("Importing libs")
     try:
         logging.getLogger('scapy.runtime').setLevel(logging.ERROR)
         from scapy.all import sniff, Dot11ProbeReq, Dot11ProbeResp, Dot11
@@ -83,7 +84,7 @@ def run():
     logfile.setFormatter(logformat)
     logfile.setLevel(logging.INFO)
     # Debug output to console
-    console = logging.StreamHandler()
+    console = logging.StreamHandler(sys.stdout)
     console.setFormatter(logformat)
     console.setLevel(logging.DEBUG)
     # Configure log utility

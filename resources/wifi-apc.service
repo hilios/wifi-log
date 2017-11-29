@@ -7,6 +7,7 @@ Requires=network.target
 ;ExecStartPre=/sbin/iw reg set CA
 ;ExecStartPre=/sbin/ifconfig wlan0 up
 ;ExecStartPre=/sbin/iwconfig wlan0 txpower 30
+ExecStartPre=/usr/local/sbin/airmon-ng check kill
 ExecStartPre=/usr/local/sbin/airmon-ng start wlan0
 ExecStart=/usr/local/bin/wifi-apc wlan0mon
 ExecStopPost=/usr/local/sbin/airmon-ng stop wlan0mon
