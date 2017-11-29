@@ -86,7 +86,6 @@ def run():
     # Configure log utility
     logging.getLogger('').addHandler(logfile)
     logging.getLogger('').addHandler(console)
-    logging.setLevel(logging.DEBUG)
     # Setup signal handling to log bye messages
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
