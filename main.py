@@ -13,6 +13,7 @@ import json
 import os
 import signal
 import sys
+import uuid
 import zmq
 
 
@@ -78,7 +79,7 @@ def run():
     # Log formatters
     logformat = logging.Formatter('%(asctime)s\t%(levelname)-8s\t%(message)s')
     # Rotating file log
-    logfile = logging.FileHandler(args.log_file, mode='a')
+    logfile = logging.FileHandler(args.log_file, mode='a+')
     logfile.setFormatter(logformat)
     logfile.setLevel(logging.INFO)
     # Debug output to console
