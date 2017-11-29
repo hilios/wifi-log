@@ -3,14 +3,14 @@ Description=WiFi APC Monitor
 Requires=network.target
 
 [Service]
-;ExecStartPre=/sbin/ifconfig wlan0 down
+;ExecStartPre=/sbin/ifconfig wlan1 down
 ;ExecStartPre=/sbin/iw reg set CA
 ;ExecStartPre=/sbin/ifconfig wlan0 up
 ;ExecStartPre=/sbin/iwconfig wlan0 txpower 30
 ExecStartPre=/usr/local/sbin/airmon-ng check kill
-ExecStartPre=/usr/local/sbin/airmon-ng start wlan0
-ExecStart=/usr/local/bin/wifi-apc wlan0mon
-ExecStopPost=/usr/local/sbin/airmon-ng stop wlan0mon
+ExecStartPre=/usr/local/sbin/airmon-ng start wlan1
+ExecStart=/usr/local/bin/wifi-apc wlan1mon
+ExecStopPost=/usr/local/sbin/airmon-ng stop wlan1mon
 Restart=always
 RestartSec=1s
 ;TimeoutStartSec=infinity

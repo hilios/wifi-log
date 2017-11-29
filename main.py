@@ -13,10 +13,10 @@ import json
 import os
 import signal
 import sys
-import uuid
 import zmq
 
 
+global log
 log = logging.getLogger('')
 
 
@@ -63,31 +63,30 @@ def signal_handler(signal_code, frame):
 
 def run():
     "Parses the CLI and run the application"
-    log_id = str(uuid.uuid4())
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
     default_log_file = '/var/log/wifi-apc.%s.log' % (current_date)
     # Configure CLI arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--port', '-P', action='store', type=int, default=5555)
-    parser.add_argument('--log-file', '-l', action='store',default=default_log_file)
+    parser.add_argument('--log-file', '-l', action='store', default=default_log_file)
     parser.add_argument('iface', action='store', help="the interface to monitor")
     args = parser.parse_args()
     # Create log dir
     log_dir = os.path.dirname(args.log_file)
     if not os.path.exists(log_dir):
         os.path.mkdir(log_dir)
-    # Log formatters
-    logformat = logging.Formatter('%(asctime)s\t%(levelname)-8s\t%(message)s')
+    # Log formatter
+    formatter = logging.Formatter('%(asctime)s\t%(levelname)-8s\t%(message)s')
     # Rotating file log
-    logfile = logging.FileHandler(args.log_file, mode='a+')
-    logfile.setFormatter(logformat)
-    logfile.setLevel(logging.INFO)
+    logfile = logging.FileHandler(args.log_file, mode='a')
+    logfile.setFormatter(formatter)
     # Debug output to console
     console = logging.StreamHandler(sys.stdout)
-    console.setFormatter(logformat)
+    console.setFormatter(formatter)
     console.setLevel(logging.DEBUG)
     # Configure log utility
+    log.setLevel(logging.INFO)
     log.addHandler(logfile)
     log.addHandler(console)
     # Setup signal handling to log bye messages
