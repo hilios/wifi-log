@@ -59,9 +59,9 @@ def signal_handler(signal_code, frame):
 
 def run():
     "Parses the CLI and run the application"
-    uuid = str(uuid.uuid4())
+    log_id = str(uuid.uuid4())
     current_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-    default_log_file = '/var/log/wifi-apc.%s.%s.log' % (current_date, uuid)
+    default_log_file = '/var/log/wifi-apc.%s.%s.log' % (current_date, log_id)
     # Configure CLI arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', '-v', action='store_true')
