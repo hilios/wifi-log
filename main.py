@@ -16,6 +16,9 @@ import sys
 import zmq
 
 
+log = logging.getLogger('')
+
+
 if os.geteuid() != 0:
     print >> sys.stderr, "You need root permissions to run this program."
     sys.exit(1)
@@ -30,7 +33,7 @@ def monitor(iface, port):
         print >> sys.stderr, "Did you install all the packager requirements?"
         sys.exit(1)
 
-    logging.debug("Opening connection socket at *:%s" % port)
+    log.debug("Opening connection socket at *:%s" % port)
     # Open socket
     context = zmq.Context()
     socket = context.socket(zmq.PUB)
@@ -41,18 +44,18 @@ def monitor(iface, port):
         if pkt.haslayer(Dot11) :
             rssi = (256 - ord(pkt.notdecoded[-2:-1])) * -1
             info = {'mac_address': pkt.addr2.upper(), 'ssid': pkt.info, 'rssi': rssi,}
-            logging.info("{mac_address}\t{ssid}\t{rssi}".format(**info))
+            log.info("{mac_address}\t{ssid}\t{rssi}".format(**info))
             socket.send(json.dumps(info))
 
-    logging.debug("Monitoring interface `%s`" % iface)
+    log.debug("Monitoring interface `%s`" % iface)
     sniff(iface=iface, prn=handler, store=False,
         lfilter=lambda p: p.haslayer(Dot11ProbeReq))
 
 
 def signal_handler(signal_code, frame):
     "Handle interrupt signals from the OS"
-    logging.debug("Bye, bye.")
-    logging.shutdown()
+    log.debug("Bye, bye.")
+    log.shutdown()
     sys.exit(0)
 
 
@@ -83,15 +86,15 @@ def run():
     console.setFormatter(logformat)
     console.setLevel(logging.DEBUG)
     # Configure log utility
-    logging.getLogger('').addHandler(logfile)
-    logging.getLogger('').addHandler(console)
+    log.addHandler(logfile)
+    log.addHandler(console)
     # Setup signal handling to log bye messages
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGHUP, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
     # Start WiFi scan
-    logging.debug("Starting to sniff wifi signal")
+    log.debug("Starting to sniff wifi signal")
     monitor(args.iface, args.port)
 
 
