@@ -1,6 +1,7 @@
 [Unit]
 Description=WiFi APC Monitor
 Requires=network.target
+After=ntp.Service
 
 [Service]
 ;ExecStartPre=/sbin/ifconfig wlan1 down
